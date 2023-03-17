@@ -1,4 +1,7 @@
-#!../../bin/linux-x86_64/Camera
+#!/opt/ad-aravis-epics-ioc/bin/linux-x86_64/Camera
+# -*- container-image: ghcr.io/cnpem/ad-aravis-epics-ioc
+
+cd /opt/ad-aravis-epics-ioc/iocBoot/iocCamera
 
 < envPaths
 

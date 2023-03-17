@@ -1,0 +1,13 @@
+services:
+  ioc:
+    image: ghcr.io/cnpem/ad-aravis-epics-ioc
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+      target: dynamic-link
+      labels:
+        org.opencontainers.image.source: https://github.com/cnpem/ad-aravis-epics-ioc
+      args:
+        REPONAME: ad-aravis-epics-ioc
+        RUNDIR: /opt/ad-aravis-epics-ioc/iocBoot/iocCamera
+        RUNTIME_PACKAGES: libxml2 libtiff5 libaravis-0.8-0
