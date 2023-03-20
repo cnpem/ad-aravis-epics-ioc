@@ -1,18 +1,11 @@
 #!../../bin/linux-x86_64/Camera
 
-#- You may have to change Camera to something else
-#- everywhere it appears in this file
+< envPaths
 
-#< envPaths
+# IOC and device specific configuration
+epicsEnvSet("PREFIX", "BL:H:BASLER01:")
+epicsEnvSet("IP_ADDRESS", "10.128.2.11")
 
-## Register all support components
-dbLoadDatabase "../../dbd/Camera.dbd"
-Camera_registerRecordDeviceDriver(pdbbase) 
-
-## Load record instances
-#dbLoadRecords("../../db/Camera.db","user=root")
+< device.cmd
 
 iocInit()
-
-## Start any sequence programs
-#seq sncCamera,"user=root"

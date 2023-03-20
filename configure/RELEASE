@@ -22,14 +22,16 @@
 # the CONFIG_SITE file.
 
 # Variables and paths to dependent modules:
-#MODULES = /path/to/modules
-#MYMODULE = $(MODULES)/my-module
+ASYN=
+BUSY=
 
-# If using the sequencer, point SNCSEQ at its top directory:
-#SNCSEQ = $(MODULES)/seq-ver
+AREA_DETECTOR=
+ADCORE=
+ADGENICAM=
+ADARAVIS=
 
 # EPICS_BASE should appear last so earlier modules can override stuff:
-EPICS_BASE = /opt/epics-R7-0-7/base
+EPICS_BASE=
 
 # Set RULES here if you want to use build rules from somewhere
 # other than EPICS_BASE:
