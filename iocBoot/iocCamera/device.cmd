@@ -7,6 +7,16 @@
 #
 # $(IP_ADDRESS)
 # Camera device IP address.
+#
+# $(DEVICE_MANUFACTURER)
+# Camera device manufacturer name.
+#
+# $(DEVICE_MODEL)
+# Camera device model string.
+#
+# $(DEVICE_VERSION)
+# This version differentiates versions from the same model, and allow
+# to uniquely identify supported features.
 
 # Register all support components
 dbLoadDatabase("${TOP}/dbd/Camera.dbd")
@@ -24,6 +34,8 @@ aravisConfig("$(PORT)", "$(IP_ADDRESS)", 0, 0, 0)
 
 # Load device general records from ADAravis
 dbLoadRecords("$(ADARAVIS)/db/aravisCamera.template", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
+# Load auto-generated template from camera XML file
+dbLoadRecords("$(TOP)/db/$(DEVICE_MANUFACTURER)_$(DEVICE_MODEL)_$(DEVICE_VERSION).db", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
 
 # Trace error and warning messages
 asynSetTraceMask("$(PORT)", 0, ERROR | WARNING)
