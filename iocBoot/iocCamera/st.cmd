@@ -14,4 +14,13 @@ epicsEnvSet("DEVICE_VERSION", "106755-13")
 
 < device.cmd
 
+# Configure Area Detector plugins
+epicsEnvSet("MAX_IMAGE_WIDTH", 1280)
+epicsEnvSet("MAX_IMAGE_HEIGHT", 1024)
+epicsEnvSet("MAX_IMAGE_PIXELS", 1310720)
+epicsEnvSet("QSIZE", 20)
+epicsEnvSet("QSIZE_HDF5", 50)
+
+< plugins.cmd
+
 iocInit()
