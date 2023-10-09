@@ -1,0 +1,4 @@
+record(ao, "$(P)$(R)AcquirePeriod") {
+   field(DRVL, "$(ACQUIRE_PERIOD_DRVL=0)")
+   field(DRVH, "inf")
+}

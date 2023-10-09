@@ -23,6 +23,11 @@ epicsEnvSet("QSIZE_HDF5", 50)
 
 < plugins.cmd
 
+# Restrict camera features
+epicsEnvSet("ACQUIRE_PERIOD_LOW_LIMIT", 0.1)
+
+< limits.cmd
+
 iocInit()
 
 < post-init.cmd
