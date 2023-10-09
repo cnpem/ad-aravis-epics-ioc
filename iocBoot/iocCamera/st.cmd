@@ -24,3 +24,5 @@ epicsEnvSet("QSIZE_HDF5", 50)
 < plugins.cmd
 
 iocInit()
+
+< post-init.cmd

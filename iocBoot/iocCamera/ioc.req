@@ -1,0 +1,2 @@
+file "camera.req",          P=$(P), R=cam1:
+file "plugins.req",         P=$(P)

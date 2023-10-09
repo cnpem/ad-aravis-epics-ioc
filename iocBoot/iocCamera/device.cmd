@@ -37,5 +37,11 @@ dbLoadRecords("$(ADARAVIS)/db/aravisCamera.template", "P=$(PREFIX), R=cam1:, POR
 # Load auto-generated template from camera XML file
 dbLoadRecords("$(TOP)/db/$(DEVICE_MANUFACTURER)_$(DEVICE_MODEL)_$(DEVICE_VERSION).db", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
 
+# Load autosave monitoring records
+dbLoadRecords("$(AUTOSAVE)/asApp/Db/save_restoreStatus.db", "P=$(PREFIX)")
+
 # Trace error and warning messages
 asynSetTraceMask("$(PORT)", 0, ERROR | WARNING)
+
+# Configure autosave
+< autosave.cmd
