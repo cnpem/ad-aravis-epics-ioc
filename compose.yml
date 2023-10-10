@@ -1,0 +1,9 @@
+services:
+  aravis:
+    image: gitregistry.cnpem.br/sol/docker/aravis
+    build:
+      dockerfile: ./Dockerfile
+      args:
+        DEBIAN_VERSION: 12
+        MESON_VERSION: 1.2.2
+        ARAVIS_VERSION: 0.8.29
