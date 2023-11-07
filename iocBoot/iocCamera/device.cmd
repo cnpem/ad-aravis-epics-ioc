@@ -17,6 +17,12 @@
 # $(DEVICE_VERSION)
 # This version differentiates versions from the same model, and allow
 # to uniquely identify supported features.
+#
+# Optional:
+#
+# $(ARV_REGISTER_CACHING), default 1
+# Enable register caching in Aravis library. Some cameras have unreliable
+# metadata regarding cache and might require have it disabled.
 
 # Register all support components
 dbLoadDatabase("${TOP}/dbd/Camera.dbd")
@@ -30,7 +36,7 @@ epicsEnvSet("EPICS_DB_INCLUDE_PATH", "$(ADCORE)/db:$(ADGENICAM)/db")
 epicsEnvSet("EPICS_CA_AUTO_ARRAY_BYTES", "YES")
 
 # Configure connection to camera
-aravisConfig("$(PORT)", "$(IP_ADDRESS)", 0, 0, 0)
+aravisConfig("$(PORT)", "$(IP_ADDRESS)", "$(ARV_REGISTER_CACHING=1)", 0, 0)
 
 # Load device general records from ADAravis
 dbLoadRecords("$(ADARAVIS)/db/aravisCamera.template", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
