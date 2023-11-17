@@ -7,6 +7,7 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install) into <top>/db
 # databases, templates, substitutions like this
 DB += $(patsubst ../%, %, $(wildcard ../Basler*.db))
+DB += $(patsubst ../%, %, $(wildcard ../AlliedVision*.db))
 DB += limits.db
 
 #----------------------------------------------------
