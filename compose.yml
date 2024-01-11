@@ -7,3 +7,6 @@ services:
         DEBIAN_VERSION: 12
         MESON_VERSION: 1.2.2
         ARAVIS_VERSION: 0.8.29
+    network_mode: host
+    volumes:
+      - .:/mnt/

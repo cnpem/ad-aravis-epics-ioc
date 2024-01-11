@@ -37,9 +37,14 @@ FROM debian:${DEBIAN_VERSION}-slim
 
 RUN apt update && \
     apt install -y --no-install-recommends \
+        ca-certificates \
         libglib2.0-0 \
-        libxml2
+        libxml2 \
+        wget
 
 COPY --from=build /tmp/install /usr/
+COPY lnls-gen-iocsh.sh /usr/local/bin/lnls-gen-iocsh
+
+WORKDIR /mnt
 
 CMD arv-tool-0.8
