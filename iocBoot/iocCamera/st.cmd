@@ -28,6 +28,8 @@ epicsEnvSet("ACQUIRE_PERIOD_LOW_LIMIT", 0.1)
 
 < limits.cmd
 
+< autosave.cmd
+
 iocInit()
 
 < post-init.cmd
