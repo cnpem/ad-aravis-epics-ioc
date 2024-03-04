@@ -28,6 +28,17 @@
 #
 # Optional parameters:
 #
+# $(IMAGE_ASYN_TYPE)
+# Value of the DTYP field of the waveform record which defines the underlying
+# asyn datatype.
+# This should be consistent with IMAGE_WAVEFORM_TYPE.
+# Defaults to Int16.
+#
+# $(IMAGE_WAVEFORM_TYPE)
+# Data type of the waveform values themselves.
+# This should be consistent with IMAGE_ASYN_TYPE.
+# Defaults to USHORT.
+#
 # $(NCHANS)
 # The maximum number of time series points in the NDPluginStats plugin.
 # Defaults to 2048.
@@ -38,7 +49,7 @@
 
 # Create Channel Access conversion plugin
 NDStdArraysConfigure("Image1", $(QSIZE), 0, $(PORT), 0, 0, 0, 0)
-dbLoadRecords("NDStdArrays.template", "P=$(PREFIX), R=image1:, PORT=Image1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT), TYPE=Int16, FTVL=USHORT, NELEMENTS=$(MAX_IMAGE_PIXELS)")
+dbLoadRecords("NDStdArrays.template", "P=$(PREFIX), R=image1:, PORT=Image1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT), TYPE=$(IMAGE_ASYN_TYPE=Int16), FTVL=$(IMAGE_WAVEFORM_TYPE=USHORT), NELEMENTS=$(MAX_IMAGE_PIXELS)")
 
 # Create 3 ROI plugins
 NDROIConfigure("ROI1", $(QSIZE), 0, "$(PORT)", 0, 0, 0, 0, 0, $(MAX_THREADS=4))
