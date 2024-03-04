@@ -1,6 +1,6 @@
 services:
   ioc:
-    image: ghcr.io/cnpem/ad-aravis-epics-ioc
+    image: ghcr.io/cnpem/ad-aravis-epics-ioc:${TAG}
     build:
       context: ./
       dockerfile: docker/Dockerfile
