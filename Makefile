@@ -8,6 +8,7 @@ DIRS += $(wildcard *Sup)
 DIRS += $(wildcard *App)
 DIRS += $(wildcard *Top)
 DIRS += $(wildcard iocBoot)
+DIRS += postinstall
 
 # The build order is controlled by these dependency rules:
 
@@ -25,6 +26,7 @@ $(foreach dir, $(filter %Top, $(DIRS)), \
 
 # iocBoot depends on all *App dirs
 iocBoot_DEPEND_DIRS += $(filter %App,$(DIRS))
+postinstall_DEPEND_DIRS += iocBoot $(wildcard *App)
 
 # Add any additional dependency rules here:
 
