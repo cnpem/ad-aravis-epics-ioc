@@ -7,11 +7,23 @@ repository_raw=https://raw.githubusercontent.com/$repository_name
 repository_api=https://api.github.com/repos/$repository_name
 repository_cr=ghcr.io/$repository_name
 
+interactive=yes
 
 if [ $# -ge 1 ]; then
-    echo "usage: $0"
+    if [ "$1" = "-y" ]; then
+        interactive=;
+    else
+        cat <<EOF
+usage: $0 [-y]
 
-    exit 1
+Generate IOC shell script (st.cmd) for ad-aravis-epics-ioc based cameras.
+
+Options:
+    -y      Use default value from all prompts and run non-interactively.
+EOF
+
+        exit 1
+    fi
 fi
 
 replace_value() {
@@ -33,6 +45,19 @@ get_feature() {
 }
 
 
+prompt() {
+    variable=$1 && shift
+    message="$@"
+
+    if [ -n "$interactive" ]; then
+        printf "$message"
+        read $variable
+    else
+        declare -g $variable=
+    fi
+}
+
+
 cameras=$(arv-tool-0.8 2>&1)
 
 if [[ $cameras =~ "No device" ]]; then
@@ -45,9 +70,8 @@ latest=${latest#*:}
 latest=${latest#*\"}
 latest=${latest%\"*}
 
-echo -n "$repository_name version to use (default $latest): "
+prompt version "$repository_name version to use (default $latest): "
 
-read version
 [ -n "$version" ] || version=$latest
 
 echo
@@ -68,8 +92,8 @@ while read -u 3 camera; do
 
     sed -i -e "s|$repository_cr|$repository_cr:$version|" $iocsh_cmd
 
-    echo -n "Prefix for camera PVs: "
-    read prefix
+    prompt prefix "Prefix for camera PVs: "
+    [ -n "$prefix" ] || prefix='""'
 
     replace_value $iocsh_cmd PREFIX $prefix
     replace_value $iocsh_cmd IP_ADDRESS $camera_ip
@@ -87,22 +111,19 @@ while read -u 3 camera; do
     replace_value $iocsh_cmd MAX_IMAGE_WIDTH $width
     replace_value $iocsh_cmd MAX_IMAGE_HEIGHT $height
 
-    echo -n "Does the camera support RGB images (yes/no) (default yes)? "
-    read colored
+    prompt colored "Does the camera support RGB images (yes/no) (default yes)? "
 
     max_num_pixels=$(( $width * $height ))
     [ "$colored" != "no" ] && max_num_pixels=$(( 3 * $max_num_pixels ))
 
     replace_value $iocsh_cmd MAX_IMAGE_PIXELS $max_num_pixels
 
-    echo -n "Acquisition period limit in seconds (default 0.1): "
-    read limit
+    prompt limit "Acquisition period limit in seconds (default 0.1): "
     [ -n "$limit" ] || limit=0.1
 
     replace_value $iocsh_cmd ACQUIRE_PERIOD_LOW_LIMIT $limit
 
-    echo -n "Generated iocsh script name (default '$filename'): "
-    read filename
+    prompt filename "Generated iocsh script name (default '$filename'): "
     [ -n "$filename" ] || filename=$(basename $iocsh_cmd)
 
     mv $iocsh_cmd $filename
