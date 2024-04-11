@@ -2,6 +2,25 @@ record(bo, "$(P)$(R)FrameRateEnable") {
    field(VAL, 1)
 }
 
+record(calc, $(P)$(R)FrameRateLimit) {
+   field(DESC, "Compute frame rate limit from period")
+   field(INPA, "$(P)$(R)AcquirePeriod.DRVL")
+   field(CALC, "1 / A")
+   field(FLNK, "$(P)$(R)FrameRateLimitFwd")
+}
+
+record(ao, "$(P)$(R)FrameRateLimitFwd") {
+   field(DESC, "Forward limit to FrameRate.DRVH")
+   field(PINI, "YES")
+   field(OMSL, "closed_loop")
+   field(DOL, "$(P)$(R)FrameRateLimit PP")
+   field(OUT, "$(P)$(R)FrameRate.DRVH NPP")
+}
+
+record(ao, "$(P)$(R)FrameRate") {
+   field(DRVL, "0")
+}
+
 record(ao, "$(P)$(R)AcquirePeriod") {
    field(DRVL, "$(ACQUIRE_PERIOD_DRVL=0)")
    field(DRVH, "inf")
