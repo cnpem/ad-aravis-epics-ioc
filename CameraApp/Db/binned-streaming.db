@@ -22,8 +22,8 @@ record(sseq, "$(P)$(R)Snapshot") {
     field(LNK6, "$(P)$(R)ImageMode CA")
     field(DO6, "0")
     field(WAIT6, "Wait")
-    field(LNK8, "$(P)$(R)Acquire CA")
-    field(DO8, "1")
+    field(LNK7, "$(P)$(R)Acquire CA")
+    field(DO7, "1")
 }
 
 record(sseq, "$(P)$(R)Stream") {
@@ -52,7 +52,6 @@ record(sseq, "$(P)$(R)Stream") {
     field(WAIT7, "Wait")
     field(LNK8, "$(P)$(R)ImageMode CA")
     field(DO8, "2")
-    field(WAIT9, "Wait")
-    field(LNKA, "$(P)$(R)Acquire CA")
-    field(DOA, "1")
+    field(LNK9, "$(P)$(R)Acquire CA")
+    field(DO9, "1")
 }
