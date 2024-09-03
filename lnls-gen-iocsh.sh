@@ -128,5 +128,7 @@ while read -u 3 camera; do
 
     mv $iocsh_cmd $filename
 
+    chmod +x $filename
+
     printf "Saved to $(realpath $filename)\n\n"
 done 3< <(echo "$cameras")
