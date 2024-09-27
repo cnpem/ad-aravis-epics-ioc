@@ -15,6 +15,7 @@ set_pass0_restoreFile("$(PREFIX).sav")
 set_pass1_restoreFile("$(PREFIX).sav")
 
 set_requestfile_path(".")
+set_requestfile_path("./genicam")
 set_requestfile_path("./basler")
 set_requestfile_path("$(TOP)", "CameraApp/Db")
 set_requestfile_path("$(CALC)", "calcApp/Db")
