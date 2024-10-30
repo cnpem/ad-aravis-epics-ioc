@@ -12,17 +12,24 @@ interactive=yes
 if [ $# -ge 1 ]; then
     if [ "$1" = "-y" ]; then
         interactive=;
-    else
+        shift
+    elif [ "$1" = "-h" ]; then
         cat <<EOF
-usage: $0 [-y]
+usage: $0 [-y|-h] [<camera_ip>...]
 
 Generate IOC shell script (st.cmd) for ad-aravis-epics-ioc based cameras.
 
+Arguments:
+    camera_ip  IP address of the camera to be configured, possibly in another
+               subnetwork. It can be multiple addresses. If not specified,
+               cameras are searched in the local subnetwork.
+
 Options:
     -y      Use default value from all prompts and run non-interactively.
+    -h      Show this help message
 EOF
 
-        exit 1
+        exit 0
     fi
 fi
 
@@ -58,11 +65,25 @@ prompt() {
 }
 
 
-cameras=$(arv-tool-0.8 2>&1)
+get_local_cameras() {
+    cameras=$(arv-tool-0.8 2>&1)
 
-if [[ $cameras =~ "No device" ]]; then
-    echo "No device found in the current subnetwork."
-    exit 1
+    if [[ $cameras =~ "No device" ]]; then
+        >&2 echo "No device found in the current subnetwork."
+        exit 1
+    fi
+
+    while read camera; do
+        camera_ip=${camera#*(}
+        camera_ip=${camera_ip%)*}
+        echo $camera_ip
+    done < <(echo "$cameras")
+}
+
+if [ $# -gt 0 ]; then
+    cameras="$@"
+else
+    cameras=$(get_local_cameras)
 fi
 
 latest=$(wget -q $repository_api/tags -O - | grep "\"name\":" | head -n 1)
@@ -76,11 +97,8 @@ prompt version "$repository_name version to use (default $latest): "
 
 echo
 
-while read -u 3 camera; do
-    camera_ip=${camera#*(}
-    camera_ip=${camera_ip%)*}
-
-    echo "Generating configuration for camera $camera"
+for camera_ip in $cameras; do
+    echo "Generating configuration for camera $camera_ip"
 
     serial_number=$(get_feature $camera_ip DeviceID)
 
@@ -131,4 +149,4 @@ while read -u 3 camera; do
     chmod +x $filename
 
     printf "Saved to $(realpath $filename)\n\n"
-done 3< <(echo "$cameras")
+done
