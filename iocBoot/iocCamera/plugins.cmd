@@ -79,6 +79,13 @@ dbLoadRecords("NDStats.template", "P=$(PREFIX), R=Stats3:, PORT=STATS3, ADDR=0, 
 NDTimeSeriesConfigure("STATS3_TS", $(QSIZE=20), 0, "STATS3", 1, 23, 0, 0, 0, 0)
 dbLoadRecords("$(ADCORE)/db/NDTimeSeries.template", "P=$(PREFIX), R=Stats3:TS:, PORT=STATS3_TS, ADDR=0, TIMEOUT=1, NDARRAY_PORT=STATS3, NDARRAY_ADDR=1, NCHANS=$(NCHANS=2048), ENABLED=1")
 
+# Create ROIStat plugin with 3 ROIs
+NDROIStatConfigure("ROISTAT1", $(QSIZE=20), 0, "$(PORT)", 0, 3, 0, 0, 0, 0, $(MAX_THREADS=4))
+dbLoadRecords("NDROIStat.template",  "P=$(PREFIX), R=ROIStat1:,   PORT=ROISTAT1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT), NCHANS=$(NCHANS=2048)")
+dbLoadRecords("NDROIStatN.template", "P=$(PREFIX), R=ROIStat1:1:, PORT=ROISTAT1, ADDR=0, TIMEOUT=1, NCHANS=$(NCHANS=2048)")
+dbLoadRecords("NDROIStatN.template", "P=$(PREFIX), R=ROIStat1:2:, PORT=ROISTAT1, ADDR=1, TIMEOUT=1, NCHANS=$(NCHANS=2048)")
+dbLoadRecords("NDROIStatN.template", "P=$(PREFIX), R=ROIStat1:3:, PORT=ROISTAT1, ADDR=2, TIMEOUT=1, NCHANS=$(NCHANS=2048)")
+
 # Create a transform plugin
 NDTransformConfigure("TRANSF1", $(QSIZE=20), 0, "$(PORT)", 0, 0, 0, 0, 0, $(MAX_THREADS=4))
 dbLoadRecords("$(ADCORE)/db/NDTransform.template", "P=$(PREFIX), R=Trans1:, PORT=TRANSF1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT)")

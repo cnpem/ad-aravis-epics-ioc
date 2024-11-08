@@ -4,6 +4,10 @@ file "NDROI_settings.req",          P=$(P),  R=ROI3:
 file "NDStats_settings.req",        P=$(P),  R=Stats1:
 file "NDStats_settings.req",        P=$(P),  R=Stats2:
 file "NDStats_settings.req",        P=$(P),  R=Stats3:
+file "NDROIStat_settings.req",      P=$(P),  R=ROIStat1:
+file "NDROIStatN_settings.req",     P=$(P),  R=ROIStat1:1:
+file "NDROIStatN_settings.req",     P=$(P),  R=ROIStat1:2:
+file "NDROIStatN_settings.req",     P=$(P),  R=ROIStat1:3:
 file "NDTransform_settings.req",    P=$(P),  R=Trans1:
 file "NDFileHDF5_settings.req",     P=$(P),  R=HDF1:
 file "NDColorConvert_settings.req", P=$(P),  R=CC1:
