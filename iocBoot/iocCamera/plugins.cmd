@@ -51,7 +51,7 @@
 
 # Create Channel Access conversion plugin
 NDStdArraysConfigure("Image1", $(QSIZE=20), 0, $(PORT), 0, 0, 0, 0)
-dbLoadRecords("NDStdArrays.template", "P=$(PREFIX), R=image1:, PORT=Image1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT), TYPE=$(IMAGE_ASYN_TYPE=Int16), FTVL=$(IMAGE_WAVEFORM_TYPE=USHORT), NELEMENTS=$(MAX_IMAGE_PIXELS)")
+dbLoadRecords("NDStdArrays.template", "P=$(PREFIX), R=image1:, PORT=Image1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT), TYPE=$(IMAGE_ASYN_TYPE=Int16), FTVL=$(IMAGE_WAVEFORM_TYPE=SHORT), NELEMENTS=$(MAX_IMAGE_PIXELS)")
 
 # Create 3 ROI plugins
 NDROIConfigure("ROI1", $(QSIZE=20), 0, "$(PORT)", 0, 0, 0, 0, 0, $(MAX_THREADS=4))
