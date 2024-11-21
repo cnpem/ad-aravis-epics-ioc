@@ -1,9 +1,8 @@
-#!/opt/ad-aravis-epics-ioc/bin/linux-x86_64/Camera
+#!/usr/bin/env Camera
 # -*- container-image: ghcr.io/cnpem/ad-aravis-epics-ioc
 
-cd /opt/ad-aravis-epics-ioc/iocBoot/iocCamera
-
-< envPaths
+< /usr/local/share/misc/envPaths
+epicsEnvSet("IOC_CONFIG", "$(TOP)/iocBoot/$(IOC)")
 
 # IOC and device specific configuration
 epicsEnvSet("PREFIX", "BL:H:BASLER01:")
@@ -12,20 +11,22 @@ epicsEnvSet("DEVICE_MANUFACTURER", "Basler")
 epicsEnvSet("DEVICE_MODEL", "acA1300-75gm")
 epicsEnvSet("DEVICE_VERSION", "106755-13")
 
-< device.cmd
+< $(IOC_CONFIG)/device.cmd
 
 # Configure Area Detector plugins
 epicsEnvSet("MAX_IMAGE_WIDTH", 1280)
 epicsEnvSet("MAX_IMAGE_HEIGHT", 1024)
 epicsEnvSet("MAX_IMAGE_PIXELS", 1310720)
 
-< plugins.cmd
+< $(IOC_CONFIG)/plugins.cmd
 
 # Restrict camera features
 epicsEnvSet("ACQUIRE_PERIOD_LOW_LIMIT", 0.1)
 
-< limits.cmd
+< $(IOC_CONFIG)/limits.cmd
+
+< $(IOC_CONFIG)/autosave.cmd
 
 iocInit()
 
-< post-init.cmd
+< $(IOC_CONFIG)/post-init.cmd

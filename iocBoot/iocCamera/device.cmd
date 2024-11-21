@@ -48,6 +48,3 @@ dbLoadRecords("$(AUTOSAVE)/asApp/Db/save_restoreStatus.db", "P=$(PREFIX)")
 
 # Trace error and warning messages
 asynSetTraceMask("$(PORT)", 0, ERROR | WARNING)
-
-# Configure autosave
-< autosave.cmd
