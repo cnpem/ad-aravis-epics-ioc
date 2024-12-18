@@ -42,7 +42,9 @@ RUN apt update && \
         libxml2 \
         wget
 
-COPY --from=build /tmp/install /usr/
+COPY --from=build /tmp/install /usr/local
+RUN ldconfig
+
 COPY lnls-gen-iocsh.sh /usr/local/bin/lnls-gen-iocsh
 
 WORKDIR /mnt
