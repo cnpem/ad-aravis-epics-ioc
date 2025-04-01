@@ -95,6 +95,10 @@ dbLoadRecords("NDROIStatN.template", "P=$(PREFIX), R=ROIStat1:3:, PORT=ROISTAT1,
 NDTransformConfigure("TRANSF1", $(QSIZE), 0, "$(PORT)", 0, 0, 0, 0, 0, $(MAX_THREADS))
 dbLoadRecords("$(ADCORE)/db/NDTransform.template", "P=$(PREFIX), R=Trans1:, PORT=TRANSF1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT)")
 
+# Create a Codec plugin
+NDCodecConfigure("CODEC1", $(QSIZE), 0, "$(PORT)", 0, 0, 0, 0, 0, $(MAX_THREADS))
+dbLoadRecords("NDCodec.template", "P=$(PREFIX), R=Codec1:, PORT=CODEC1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT)")
+
 # Configure HDF5 file format plugin
 NDFileHDF5Configure("FileHDF1", $(QSIZE_HDF5), 0, "$(PORT)", 0)
 dbLoadRecords("NDFileHDF5.template", "P=$(PREFIX), R=HDF1:, PORT=FileHDF1, ADDR=0, TIMEOUT=1, NDARRAY_PORT=$(PORT)")
