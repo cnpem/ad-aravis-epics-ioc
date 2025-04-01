@@ -10,4 +10,4 @@ services:
       args:
         REPONAME: ad-aravis-epics-ioc
         RUNDIR: /opt/ad-aravis-epics-ioc/iocBoot/iocCamera
-        RUNTIME_PACKAGES: libxml2 libtiff5 libaravis-0.8-0
+        RUNTIME_PACKAGES: libxml2 libtiff6 libaravis-0.8-0
