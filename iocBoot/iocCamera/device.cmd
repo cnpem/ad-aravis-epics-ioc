@@ -49,5 +49,8 @@ dbLoadRecords("$(AUTOSAVE)/asApp/Db/save_restoreStatus.db", "P=$(PREFIX)")
 # Trace error and warning messages
 asynSetTraceMask("$(PORT)", 0, ERROR | WARNING)
 
+# Use larger callback queue to account for the high number of PVs
+callbackSetQueueSize(5000)
+
 # Configure autosave
 < autosave.cmd
