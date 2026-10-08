@@ -17,7 +17,7 @@ if [ $# -ge 1 ]; then
         cat <<EOF
 usage: $0 [-y|-h] [<camera_ip>...]
 
-Generate IOC shell script (st.cmd) for ad-aravis-epics-ioc based cameras.
+Generate YAML snippet with variables relevant for deploying the IOC.
 
 Arguments:
     camera_ip  IP address of the camera to be configured, possibly in another
@@ -32,15 +32,6 @@ EOF
         exit 0
     fi
 fi
-
-replace_value() {
-    file=$1
-    key=$2
-    value="$3"
-
-    sed -i -e "s|epicsEnvSet(\"$key\", .*)|epicsEnvSet(\"$key\", $value)|" $file
-}
-
 
 get_feature() {
     ip=$1
@@ -102,51 +93,48 @@ for camera_ip in $cameras; do
 
     serial_number=$(get_feature $camera_ip DeviceID)
 
-    filename=$camera_ip.cmd
-    iocsh_cmd=/tmp/$filename
-
-    wget $repository_raw/$version/iocBoot/iocCamera/st.cmd -O $iocsh_cmd &> /tmp/wget-$camera_ip.log \
-        || (cat /tmp/wget-$camera_ip.log && false)
-
-    sed -i -e "s|$repository_cr|$repository_cr:$version|" $iocsh_cmd
-
     prompt prefix "Prefix for camera PVs: "
-    [ -n "$prefix" ] || prefix='""'
-
-    replace_value $iocsh_cmd PREFIX $prefix
-    replace_value $iocsh_cmd IP_ADDRESS $camera_ip
+    [ -n "$prefix" ] || prefix=''
 
     manufacturer=$(get_feature $camera_ip DeviceVendorName | sed -e "s| ||g")
-    replace_value $iocsh_cmd DEVICE_MANUFACTURER $manufacturer
-
     model=$(get_feature $camera_ip DeviceModelName | sed -e "s| |-|g")
-    replace_value $iocsh_cmd DEVICE_MODEL $model
-    replace_value $iocsh_cmd DEVICE_VERSION $(get_feature $camera_ip DeviceVersion)
 
+    device_version=$(get_feature $camera_ip DeviceVersion)
     width=$(get_feature $camera_ip SensorWidth | cut -d' ' -f 1)
     height=$(get_feature $camera_ip SensorHeight | cut -d' ' -f 1)
-
-    replace_value $iocsh_cmd MAX_IMAGE_WIDTH $width
-    replace_value $iocsh_cmd MAX_IMAGE_HEIGHT $height
 
     prompt colored "Does the camera support RGB images (yes/no) (default yes)? "
 
     max_num_pixels=$(( $width * $height ))
     [ "$colored" != "no" ] && max_num_pixels=$(( 3 * $max_num_pixels ))
 
-    replace_value $iocsh_cmd MAX_IMAGE_PIXELS $max_num_pixels
+    prompt apply_limit "Should the acquisition frame rate be limited (yes/no) (default yes)? "
 
-    prompt limit "Acquisition period limit in seconds (default 0.1): "
-    [ -n "$limit" ] || limit=0.1
+    limit=
+    if [ "$apply_limit" != "no" ]; then
+        prompt limit "Acquisition period limit in seconds (default 0.1): "
+        [ -n "$limit" ] || limit=0.1
+    fi
 
-    replace_value $iocsh_cmd ACQUIRE_PERIOD_LOW_LIMIT $limit
+    default_filename=$camera_ip.yml
+    prompt filename "Generated iocsh script name (default '$default_filename'): "
+    [ -n "$filename" ] || filename=$default_filename
 
-    prompt filename "Generated iocsh script name (default '$filename'): "
-    [ -n "$filename" ] || filename=$(basename $iocsh_cmd)
-
-    mv $iocsh_cmd $filename
-
-    chmod +x $filename
+    cat << EOF > $filename
+    image: ghcr.io/cnpem/ad-aravis-epics-ioc:$version
+    environment:
+      PREFIX: "$prefix"
+      IP_ADDRESS: "$camera_ip"
+      DEVICE_MANUFACTURER: "$manufacturer"
+      DEVICE_MODEL: "$model"
+      DEVICE_VERSION: "$device_version"
+      MAX_IMAGE_WIDTH: $width
+      MAX_IMAGE_HEIGHT: $height
+      MAX_IMAGE_PIXELS: $max_num_pixels
+EOF
+    [ -n "$limit" ] && cat << EOF >> $filename
+      ACQUIRE_PERIOD_LOW_LIMIT: $limit
+EOF
 
     printf "Saved to $(realpath $filename)\n\n"
 done
