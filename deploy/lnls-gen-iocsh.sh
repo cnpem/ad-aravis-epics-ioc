@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+set -ue
+
+repository_name=cnpem/ad-aravis-epics-ioc
+repository_raw=https://raw.githubusercontent.com/$repository_name
+repository_api=https://api.github.com/repos/$repository_name
+repository_cr=ghcr.io/$repository_name
+
+interactive=yes
+
+if [ $# -ge 1 ]; then
+    if [ "$1" = "-y" ]; then
+        interactive=;
+        shift
+    elif [ "$1" = "-h" ]; then
+        cat <<EOF
+usage: $0 [-y|-h] [<camera_ip>...]
+
+Generate IOC shell script (st.cmd) for ad-aravis-epics-ioc based cameras.
+
+Arguments:
+    camera_ip  IP address of the camera to be configured, possibly in another
+               subnetwork. It can be multiple addresses. If not specified,
+               cameras are searched in the local subnetwork.
+
+Options:
+    -y      Use default value from all prompts and run non-interactively.
+    -h      Show this help message
+EOF
+
+        exit 0
+    fi
+fi
+
+replace_value() {
+    file=$1
+    key=$2
+    value="$3"
+
+    sed -i -e "s|epicsEnvSet(\"$key\", .*)|epicsEnvSet(\"$key\", $value)|" $file
+}
+
+
+get_feature() {
+    ip=$1
+    feature=$2
+
+    response=$(arv-tool-0.8 -a $ip control $feature)
+
+    echo ${response#*=}
+}
+
+
+prompt() {
+    variable=$1 && shift
+    message="$@"
+
+    if [ -n "$interactive" ]; then
+        printf "$message"
+        read $variable
+    else
+        declare -g $variable=
+    fi
+}
+
+
+get_local_cameras() {
+    cameras=$(arv-tool-0.8 2>&1)
+
+    if [[ $cameras =~ "No device" ]]; then
+        >&2 echo "No device found in the current subnetwork."
+        exit 1
+    fi
+
+    while read camera; do
+        camera_ip=${camera#*(}
+        camera_ip=${camera_ip%)*}
+        echo $camera_ip
+    done < <(echo "$cameras")
+}
+
+if [ $# -gt 0 ]; then
+    cameras="$@"
+else
+    cameras=$(get_local_cameras)
+fi
+
+latest=$(wget -q $repository_api/tags -O - | grep "\"name\":" | head -n 1)
+latest=${latest#*:}
+latest=${latest#*\"}
+latest=${latest%\"*}
+
+prompt version "$repository_name version to use (default $latest): "
+
+[ -n "$version" ] || version=$latest
+
+echo
+
+for camera_ip in $cameras; do
+    echo "Generating configuration for camera $camera_ip"
+
+    serial_number=$(get_feature $camera_ip DeviceID)
+
+    filename=$camera_ip.cmd
+    iocsh_cmd=/tmp/$filename
+
+    wget $repository_raw/$version/iocBoot/iocCamera/st.cmd -O $iocsh_cmd &> /tmp/wget-$camera_ip.log \
+        || (cat /tmp/wget-$camera_ip.log && false)
+
+    sed -i -e "s|$repository_cr|$repository_cr:$version|" $iocsh_cmd
+
+    prompt prefix "Prefix for camera PVs: "
+    [ -n "$prefix" ] || prefix='""'
+
+    replace_value $iocsh_cmd PREFIX $prefix
+    replace_value $iocsh_cmd IP_ADDRESS $camera_ip
+
+    manufacturer=$(get_feature $camera_ip DeviceVendorName | sed -e "s| ||g")
+    replace_value $iocsh_cmd DEVICE_MANUFACTURER $manufacturer
+
+    model=$(get_feature $camera_ip DeviceModelName | sed -e "s| |-|g")
+    replace_value $iocsh_cmd DEVICE_MODEL $model
+    replace_value $iocsh_cmd DEVICE_VERSION $(get_feature $camera_ip DeviceVersion)
+
+    width=$(get_feature $camera_ip SensorWidth | cut -d' ' -f 1)
+    height=$(get_feature $camera_ip SensorHeight | cut -d' ' -f 1)
+
+    replace_value $iocsh_cmd MAX_IMAGE_WIDTH $width
+    replace_value $iocsh_cmd MAX_IMAGE_HEIGHT $height
+
+    prompt colored "Does the camera support RGB images (yes/no) (default yes)? "
+
+    max_num_pixels=$(( $width * $height ))
+    [ "$colored" != "no" ] && max_num_pixels=$(( 3 * $max_num_pixels ))
+
+    replace_value $iocsh_cmd MAX_IMAGE_PIXELS $max_num_pixels
+
+    prompt limit "Acquisition period limit in seconds (default 0.1): "
+    [ -n "$limit" ] || limit=0.1
+
+    replace_value $iocsh_cmd ACQUIRE_PERIOD_LOW_LIMIT $limit
+
+    prompt filename "Generated iocsh script name (default '$filename'): "
+    [ -n "$filename" ] || filename=$(basename $iocsh_cmd)
+
+    mv $iocsh_cmd $filename
+
+    chmod +x $filename
+
+    printf "Saved to $(realpath $filename)\n\n"
+done
