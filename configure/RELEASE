@@ -23,6 +23,7 @@
 
 # Variables and paths to dependent modules:
 ASYN=
+CALC=
 BUSY=
 
 AREA_DETECTOR=
