@@ -20,6 +20,8 @@ Camera_LIBS += autosave
 Camera_DBD += sseqRecord.dbd
 Camera_LIBS += calc
 
+Camera_DBD += system.dbd
+
 Camera_SRCS += Camera_registerRecordDeviceDriver.cpp
 
 # Build the main IOC entry point on workstation OSs.

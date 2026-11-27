@@ -8,16 +8,6 @@
 # $(IP_ADDRESS)
 # Camera device IP address.
 #
-# $(DEVICE_MANUFACTURER)
-# Camera device manufacturer name.
-#
-# $(DEVICE_MODEL)
-# Camera device model string.
-#
-# $(DEVICE_VERSION)
-# This version differentiates versions from the same model, and allow
-# to uniquely identify supported features.
-#
 # Optional:
 #
 # $(ARV_REGISTER_CACHING), default 1
@@ -27,6 +17,9 @@
 # Register all support components
 dbLoadDatabase("${TOP}/dbd/Camera.dbd")
 Camera_registerRecordDeviceDriver(pdbbase)
+
+# Generate camera-specific GenICam database
+system("./generate-camera-db.sh $(IP_ADDRESS) $(TOP) $(ADGENICAM)")
 
 # Define camera driver port
 epicsEnvSet("PORT", "CAM")
@@ -41,7 +34,7 @@ aravisConfig("$(PORT)", "$(IP_ADDRESS)", "$(ARV_REGISTER_CACHING=1)", 0, 0)
 # Load device general records from ADAravis
 dbLoadRecords("$(ADARAVIS)/db/aravisCamera.template", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
 # Load auto-generated template from camera XML file
-dbLoadRecords("$(TOP)/db/$(DEVICE_MANUFACTURER)_$(DEVICE_MODEL)_$(DEVICE_VERSION).db", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
+dbLoadRecords("$(TOP)/db/device.db", "P=$(PREFIX), R=cam1:, PORT=$(PORT)")
 
 # Load autosave monitoring records
 dbLoadRecords("$(AUTOSAVE)/asApp/Db/save_restoreStatus.db", "P=$(PREFIX)")

@@ -10,4 +10,5 @@ services:
       args:
         REPONAME: ad-aravis-epics-ioc
         RUNDIR: /opt/ad-aravis-epics-ioc/iocBoot/iocCamera
-        RUNTIME_PACKAGES: libxml2 libtiff6 libaravis-0.8-0
+        RUNTIME_PACKAGES: libxml2 libtiff6 libaravis-0.8-0 aravis-tools-cli python3
+        APP_DIRS: /opt/epics/modules/areaDetector/ADGenICam/scripts
